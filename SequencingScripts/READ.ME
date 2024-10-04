@@ -1,0 +1,32 @@
+#INSTRUCTIONS FOR RUNNING SEQUENCING
+
+#1. Edit nextflow scripts to contain correct information
+cp Aug2024_CGSB_template.nf DATE_CGSB_template.nf
+
+vi nextflow.Aug2024.config #replace name of params.reads, params.ref, params.outdir, and params.fcid; edit the following and replace first four lines with new folders
+
+// Required Parameters
+params.reads = "/scratch/cgsb/gencore/out/Siegal/2024-08-14_HWMMFDMXY/merged/*fastq*"
+params.ref = "$HOME/Sequencing/Reference/*.fna"
+params.outdir = "/scratch/cgsb/siegal/Cassandra_2024/Aug2024_HWMMFDMXY"
+params.fcid = "HWMMFDMXY"
+
+
+#2. Run nextflow:
+sbatch nextflow_runner.CuSO4_ALL_2024.q Aug2024_CGSB_template.nf nextflow.Aug2024.config 
+
+#3. Copy non-nextflow files into output folder
+cp CB* /path/to/output/before/out
+cd /path/to/output/before/out
+
+#4. When all files are finished running through nextflow, merge, index, split, etc
+sbatch CB_2.3_merge.split.all.q out/bqsr_bams/*bam
+
+#5. Index each of the files once done
+for i in *bam; do sbatch CB_3.0_Index.q $i; done
+
+#6. Run variant calling on all in parallel
+for i in *bam; do sbatch CB_4.0_CallVariants.q $i; done
+
+#7. Once all variants are called, merge together files and create output table
+sbatch CB_5.0_zip.concat.sort.q AllCuSO4.REF_
