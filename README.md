@@ -4,18 +4,17 @@ Data and analysis for preprint: doi:
 
 ## Data Availability
 ### Analyzed files available here:
-1. *something.csv*: Additive peaks called using the cybr_lmpeaks() function
-2. *somethingelse.csv*: Interaction peaks, which are the highest points on each chromosome above the 5% FDR
-3. *somethingelse*:
-
+1. **CuSO4_glmer_output.csv**: Additive peaks called using the cybr_lmpeaks() function
+2. **Interaction_Peaks.csv**: Interaction peaks, which are the highest points on each chromosome above the 5% FDR
+   
 ### Sequencing Files
 4. link to SRR
 
 ### Raw Data
 5. output.table files in the `Input` folder
-   x something
-   x something
-   x something
+   x **AllCuSO4.REF_.SortedCat.vcf.output.zip**: raw data, zipped via Windows
+   x **Oak_VCF.txt** and **Wine_VCF.txt**: text files for parent data
+   x **experiment_names_524.csv**: index of experiment names, to be loaded in to analysis scripts
 
 ### cybrBSA Package
 Please download the package by visiting github: https://github.com/cbuzby/cybrBSA
