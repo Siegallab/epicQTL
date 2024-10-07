@@ -1,6 +1,6 @@
 # epic-QTL Data and Analysis Scripts
  
-Here we have included the data and analysis for preprint: doi: 
+Here we have included the data and analysis for preprint: doi:TBD
 
 All raw data is linked or included below, and analysis scripts are included in the two folders: `SequencingScripts` and `BSA_Analysis`. Supplemental figures and text can be found in PDF form in publication (linked above).
 
