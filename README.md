@@ -4,6 +4,8 @@ Here we have included the data and analysis for preprint: doi:
 
 All raw data is linked or included below, and analysis scripts are included in the two folders: `SequencingScripts` and `BSA_Analysis`. Supplemental figures and text can be found in PDF form in publication (linked above).
 
+***  
+
 ## Data Availability
 ### Analyzed files available here:
 1. **CuSO4_glmer_output.csv**: Additive peaks called using the cybr_lmpeaks() function
@@ -19,12 +21,13 @@ All raw data is linked or included below, and analysis scripts are included in t
    c. **experiment_names_524.csv**: index of experiment names, to be loaded in to analysis scripts  
 
 ### cybrBSA Package
-Please download the package by visiting github: https://github.com/cbuzby/cybrBSA
+Please download the package by visiting the [cybrBSA github](https://github.com/cbuzby/cybrBSA)
 ```
 library(devtools)
 install_github("cbuzby/cybrBSA")
 ```
 
+***  
 
 ## Analysis Code
 ### Sequencing
@@ -57,17 +60,41 @@ gatk ApplyBQSR \
 
 Once raw sequences were processed into bam files for each bulk, we combined all bulks together and ran variant calling on each chromosome (containing all bulks) in parallel:
 ```
-CB_2.3_merge.split.all.q
-CB_3.0_Index.q
-CB_4.0_CallVariants.q
-CB_5.0_zip.concat.sort.q
+############## CB_2.3_merge.split.all.q #######################################
+
+samtools merge AllCuSO4 $1 $2... ${70}
+samtools index AllCuSO4
+bamtools split -in AllCuSO4 -reference
+
+############## CB_3.0_Index.q #################################################
+
+samtools index $1
+
+############## CB_4.0_CallVariants.q ##########################################
+
+gatk HaplotypeCaller -I $1 -R $REF -ploidy 1 -O ${1}.vcf
+
+############## CB_5.0_zip.concat.sort.q #######################################
+
+for i in ${1}*vcf; do bgzip -c $i > ${i}.gz; done
+echo ${1}*vcf.gz |  xargs -n1 tabix -p vcf
+bcftools concat -o unsortedcat.vcf -a -D ${1}*vcf.gz
+bcftools sort -Oz -o ${1}.SortedCat.vcf unsortedcat.vcf
+
+myfile=${1}.SortedCat.vcf
+
+gatk VariantsToTable \
+     -V ${myfile} \
+     -F CHROM -F POS -F REF -F ALT \
+     -GF AD -GF DP -GF GQ -GF PL \
+     -O ${myfile}.output.table
 ```
 
 Please see READ.ME in the `Sequencing` folder for execution code.
 
 ### Bulk Segregant Analysis
-Files for analyzing output tables for epicQTL are found in the `BSA_Analysis` folder, with folders for Input and Output data. All analysis is done using the `CuPAPER_1byRep_Process.Rmd` file, which utilizes the cybrBSA (https://github.com/cbuzby/cybrBSA) package. Please download this package from github to use. Analysis scripts for output table data can all be found in `CuPAPER_1byRep_Process.Rmd`. Additional examples (and a sample dataset) can be found in the documentation for cybrBSA.
+Files for analyzing output tables for epicQTL are found in the [BSA_Analysis](https://github.com/Siegallab/epicQTL/tree/main/BSA_Analysis) folder, with folders for `Input` and `Output` folders for data. All analysis is done using the `CuPAPER_1byRep_Process.Rmd` file, which utilizes the [cybrBSA](https://github.com/cbuzby/cybrBSA) package. Analysis scripts for output table data can all be found in [/BSA_Analysis/CuPAPER_1byRep_Process.Rmd](https://github.com/Siegallab/epicQTL/blob/main/BSA_Analysis/CuPAPER_1byRep_Process.Rmd). Additional examples (and a sample dataset) can be found in the documentation for cybrBSA.
 
 ### Visualization
-Scripts for each figure of the manuscript are included in the visualizations `CuPAPER_Figures.Rmd` within the `BSA_Analysis` folder. 
+Scripts for each figure of the manuscript are included in the visualizations [/BSA_Analysis/CuPAPER_Figures.Rmd](https://github.com/Siegallab/epicQTL/blob/main/BSA_Analysis/CuPAPER_Figures.Rmd), and utilize the `Ouput` data within the folder. 
 
