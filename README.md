@@ -12,9 +12,9 @@ Data and analysis for preprint: doi:
 
 ### Raw Data
 5. output.table files in the `Input` folder  
-   x **AllCuSO4.REF_.SortedCat.vcf.output.zip**: raw data, zipped via Windows  
-   x **Oak_VCF.txt** and **Wine_VCF.txt**: text files for parent data  
-   x **experiment_names_524.csv**: index of experiment names, to be loaded in to analysis scripts  
+   a. **AllCuSO4.REF_.SortedCat.vcf.output.zip**: raw data, zipped via Windows  
+   b. **Oak_VCF.txt** and **Wine_VCF.txt**: text files for parent data  
+   c. **experiment_names_524.csv**: index of experiment names, to be loaded in to analysis scripts  
 
 ### cybrBSA Package
 Please download the package by visiting github: https://github.com/cbuzby/cybrBSA
@@ -26,13 +26,31 @@ install_github("cbuzby/cybrBSA")
 
 ## Analysis Code
 ### Sequencing
-Sequencing scripts are located in the Sequencing folder; we used Nextflow, but each step can be done individually. Generally, steps are as follows (and can be found in the `Aug2024_CGSB_template.nf` Workflow segment):  
+Sequencing scripts are located in the `SequencingScripts` folder; we used Nextflow, but each step can be run individually. Workflow is as follows (and can be found in the `Aug2024_CGSB_template.nf` Workflow segment):  
 ```
-trim(files_ch) | set{ trimmed_ch }
-align(trimmed_ch) | set{ aligned_ch }
-sort(aligned_ch) | set{ sorted_ch }
-MakeBQSRTable(sorted_ch) | set{ bqsrtables_ch }
-ApplyBQSR(bqsrtables_ch) | set{ bqsr_bam_ch }
+#trim
+java -jar /share/apps/trimmomatic/0.36/trimmomatic-0.36.jar SE -phred33 \
+ $reads $trimmed_file ILLUMINACLIP:TruSeq3-SE:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+
+#align
+bwa mem -Y -K 100000000 -R \"${readGroup}\" \
+ $REF $read_1 > ${id}.aln-se.sam
+
+#sort
+java -jar $PICARD_JAR SortSam \
+                  INPUT=$read_1 \
+                  OUTPUT=${id}.aln-se.bam \
+                  SORT_ORDER=coordinate
+
+#MakeBQSRTable
+gatk BaseRecalibrator -R $REF -I $read --known-sites $KNOWN_SITES -O ${id}_recal_data.table
+
+#ApplyBQSR
+gatk ApplyBQSR \
+	   -R $REF \
+	   -I ${bamfile} \
+	   --bqsr-recal-file ${table} \
+	   -O ${id}.bqsr.output.bam
 ```
 
 Once raw sequences were processed into bam files for each bulk, we combined all bulks together and ran variant calling on each chromosome (containing all bulks) in parallel:
@@ -46,8 +64,8 @@ CB_5.0_zip.concat.sort.q
 Please see READ.ME in the `Sequencing` folder for execution code.
 
 ### Bulk Segregant Analysis
-All analysis is done using the `CuPAPER_1byRep_Process.Rmd` file, which utilizes the cybrBSA (https://github.com/cbuzby/cybrBSA) package. Please download this package from github to use. Analysis scripts for output table data can all be found in `CuPAPER_1byRep_Process.Rmd`. Additional examples (and a sample dataset) can be found in the documentation for cybrBSA.
+Files for analyzing output tables for epicQTL are found in the `BSA_Analysis` folder, with folders for Input and Output data. All analysis is done using the `CuPAPER_1byRep_Process.Rmd` file, which utilizes the cybrBSA (https://github.com/cbuzby/cybrBSA) package. Please download this package from github to use. Analysis scripts for output table data can all be found in `CuPAPER_1byRep_Process.Rmd`. Additional examples (and a sample dataset) can be found in the documentation for cybrBSA.
 
 ### Visualization
-Scripts for each figure of the manuscript are included in the visualizations `CuPAPER_Figures.Rmd`. 
+Scripts for each figure of the manuscript are included in the visualizations `CuPAPER_Figures.Rmd` within the `BSA_Analysis` folder. 
 
