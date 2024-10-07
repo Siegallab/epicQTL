@@ -1,6 +1,8 @@
-# ChromosomeFixation
+# epic-QTL Data and Analysis Scripts
  
-Data and analysis for preprint: doi:
+Here we have included the data and analysis for preprint: doi: 
+
+All raw data is linked or included below, and analysis scripts are included in the two folders: `SequencingScripts` and `BSA_Analysis`. Supplemental figures and text can be found in PDF form in publication (linked above).
 
 ## Data Availability
 ### Analyzed files available here:
