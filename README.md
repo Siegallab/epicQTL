@@ -97,7 +97,7 @@ Files for analyzing output tables for epicQTL are found in the [BSA_Analysis](ht
 
 The output table is read in through `cybrInputGATKTable()`, and then "called" for parent alleles using Wine.txt and Oak.txt (which are included in supplemental data).
 ```
-mydatatotest = "AllCuSO4.SortedCat.vcf.output.table"
+mydatatotest = "AllCuSO4.REF_.SortedCat.vcf.output"
 
 cybrInputGATKTable(mydatatotest) %>% mutate(Coverage = as.numeric(AD.REF) + as.numeric(AD.ALT)) %>%
   select(POS, CHROM, Dataset, GQ, AD.REF, AD.ALT, Coverage) -> rawdata
