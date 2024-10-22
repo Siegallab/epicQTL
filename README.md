@@ -21,7 +21,7 @@ All raw data is linked or included below, and analysis scripts are included in t
    c. **experiment_names_524.csv**: index of experiment names, to be loaded in to analysis scripts  
 
 ### cybrBSA Package
-Please download the package by visiting the [cybrBSA github](https://github.com/cbuzby/cybrBSA)
+Please download the package by visiting the [cybrBSA github](https://github.com/cbuzby/cybrBSA) or by running the following code in R:
 ```
 library(devtools)
 install_github("cbuzby/cybrBSA")
