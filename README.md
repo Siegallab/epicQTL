@@ -11,10 +11,10 @@ All raw data is linked or included below, and analysis scripts are included in t
 1. **CuSO4_glmer_output.csv**: Additive peaks called using the cybr_lmpeaks() function
 2. **Interaction_Peaks.csv**: Interaction peaks, which are the highest points on each chromosome above the 5% FDR
    
-### Sequencing Files
-4. link to SRR
+### Raw Sequencing Files
+4. SRA Repository PRJNA1175662
 
-### Raw Data
+### Input Data
 5. output.table files in the `Input` folder  
    a. **AllCuSO4.REF_.SortedCat.vcf.output.zip**: raw data, zipped via Windows  
    b. **Oak_VCF.txt** and **Wine_VCF.txt**: text files for parent data  
