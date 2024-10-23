@@ -676,6 +676,9 @@ dat_text <- data.frame(label = c("CUP1", "FRE1"),
                       x     = c(2.75e5, 6.5e5),
                       y     = c(12.5, 7))
 
+q5_all %>% filter(label == "Bulk") %>% select(CSS = chr, Bulkq5 = q5) %>% 
+  merge(rbind(data.frame(CSS = "I", CHROM = as.character(as.roman(c(8,12)))),
+                        data.frame(CSS = "VIII", CHROM = as.character(as.roman(c(12)))))) -> q5_Bulk_f2
 
 AllCuSO4_glmer_1byRep %>% filter(CHROM %in% c("VIII", "XII")) %>%
   filter(label %in% c("Bulk")) %>%
@@ -683,7 +686,7 @@ AllCuSO4_glmer_1byRep %>% filter(CHROM %in% c("VIII", "XII")) %>%
   geom_vline(data = Fig2Genes, aes(xintercept = c(Gene.chromosomeLocation.start)),
              size = 2, alpha = 0.5, color = "turquoise3") +  
   geom_line(aes(linetype = CSS)) +
-  geom_hline(data = q5_all[q5_all$label %in% c("Bulk"),], aes(yintercept = q5, linetype = chr)) +
+  geom_hline(data = q5_Bulk_f2, aes(yintercept = Bulkq5, linetype = CSS)) +
   facet_grid(~CHROM, space = "free", scales = "free") +
   labs(color = NULL, linetype = NULL, alpha = NULL) +
   theme_bw() +
@@ -692,9 +695,9 @@ AllCuSO4_glmer_1byRep %>% filter(CHROM %in% c("VIII", "XII")) %>%
   ylim(0, 13) + 
   geom_text(data = dat_text, mapping = aes(x =x, y = y, label = label)) +
   #annotate(data = CUP1annotate, geom = "text") + 
-  xlab("Chromosomal Position") +
+  xlab("Chromosomal Position (kb)") +
   #scale_y_continuous( breaks=pretty_breaks()) +
-  scale_x_continuous( breaks=pretty_breaks()) +
+  scale_x_continuous(labels = unit_format(unit = "", scale = 1e-3, accuracy = 1), breaks=pretty_breaks()) +
   scale_size_manual(values = c(0.1, 2)) +
   scale_color_manual(values = c("turquoise3", "turquoise3")) +
   scale_linetype_manual(values = c(2,1)) -> Fig2
@@ -831,8 +834,18 @@ c2 = "#4197b5"
 
 q5_all %>% filter(label == "Bulk") %>% select(CSS = chr, Bulkq5 = q5) -> q5_Bulk
 
+q5_Bulk %>% merge(rbind(data.frame(CSS = "I", CHROM = as.character(as.roman(2:16))),
+                        data.frame(CSS = "VIII", CHROM = as.character(as.roman(c(1:7, 9:16)))))) -> q5_Bulk
+
+AllCuSO4_glmer_1byRep %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) -> AllCuSO4_glmer_1byRep
+peaks %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) -> peaks
+q5_Bulk %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) -> q5_Bulk
+
+################################################################################
+
 #Manhattan Plot WITH bars
 AllCuSO4_glmer_1byRep %>%
+  mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) %>%
   filter(label == "Bulk") %>%
   ggplot(aes(x = POS, y = abs(zscore))) + 
   geom_line(aes(linetype = CSS)) +
@@ -878,6 +891,10 @@ Fig3
 
 ggsave("Fig3.tif", plot = Fig3, dpi = 300, width = 8, height = 3.5)
 ggsave("Fig3.png", plot = Fig3, dpi = 300, width = 8, height = 3.5)
+
+levels(q5_Bulk$CHROM)
+
+
 ```
 
 ## Figure 4
@@ -1073,8 +1090,11 @@ read.csv("C:/Users/Cassandra/Documents/R_FileTransfer/CuSO4_Phenotyping_2024.csv
   theme(axis.text.x = element_text(), 
         panel.grid = element_blank(), axis.text = element_text(size = 14),
         text = element_text(size = 16),
-        legend.position = "none")
+        legend.position = "none") -> S1_Fig
 
+S1_Fig
+
+ggsave("S1_Fig.tif", S1_Fig, dpi = 300, width = 6, height = 4)
 ```
 
 # Comparison with Previous Studies
@@ -1201,7 +1221,7 @@ Bloom_Ints %>% filter(trait == "CopperSulfate") %>%
          POS = as.numeric(POS)) -> Bloom_Ints_rf
 ```
 
-Nguyen dataset?
+Nguyen Ba dataset
 ```{r}
 NguyenCu <- read.csv("C:/Users/Cassandra/Downloads/elife-73983-supp4-v2_copper.csv", header = TRUE)
 
@@ -1237,4 +1257,77 @@ AlbertHotspotMap %>%
 
 ```
 
+```{r, fig.width=10, fig.height=4}
+
+
+AllCuSO4_glmer_1byRep %>%
+  merge(q5_all) %>%
+  filter(CSS == "VIII", chr == "VIII") %>%
+  mutate(CSS = paste("Fixed Chr", CSS)) %>%
+  filter(label %in% c("Interaction")) %>%
+
+
+  ggplot(aes(x = POS, y = abs(zscore), color = label)) +
+  #geom_ribbon(aes(ymin = -Inf, ymax = 0, xmin = -Inf, xmax = Inf), fill = "gray", outline.type = "lower") +
+  geom_point(data = ChromosomeScale, aes(x = POS, y = 0), color = "white") + 
+  geom_vline(data = IntPeaks,
+             aes(xintercept = POS),
+             color = "red", 
+             size = 1, alpha = 0.3)+
+  geom_vline(data = SecondaryPeaks,
+             aes(xintercept = POS),
+             linetype = "dashed",
+             color = "red", 
+             size = 1, alpha = 0.3) +
+  geom_vline(data = sgd_copper[sgd_copper$Gene.symbol == "CUP1-1",],
+             aes(xintercept = Gene.chromosomeLocation.start),
+             color = "#4197b5", 
+             size = 1, alpha = 0.8, linetype = 3)+
+  geom_line() +
+  geom_tile(data = NguyenCu_rf, aes(x = POS, y = -0.2, width = 2, height = 0.4), 
+            color = "violet", linewidth = 1) + 
+  geom_tile(data = M_hotspots_rf, aes(x = POS, y = -0.6, width = 2, height = 0.4), 
+            color = "turquoise3", linewidth = 1) +  
+  geom_tile(data = Bloom_Ints_rf, aes(x = POS, y = -1, width = 2, height = 0.4), 
+            color = "blue", linewidth = 1) +
+  
+  xlab("Position") + ylab("| z-score |") +
+  geom_hline(aes(yintercept = q5), linetype = "dashed") +
+  scale_color_manual(values = c("black")) +
+  facet_grid(CSS~CHROM, scales = "free", space = "free") +
+  theme_bw() +
+    
+  scale_y_continuous(expand = c(0,0), limits = c(-1.2,4)) +
+
+  theme(strip.background.x = element_rect(fill = c("gray"),color = c("gray")),
+        strip.background.y = element_rect(fill = c("black"),color = c("black")),
+        strip.text.y = element_text(color = "white", size = 10, face = "bold"),
+        panel.spacing = unit(0.1, "lines"),
+        panel.border = element_rect(color = "gray"),
+        legend.position = "none", 
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) -> S2Fig
+
+S2Fig
+
+
+save_plot(filename = "S2Fig.tif", plot = S2Fig, base_height = 4, base_width = 10)
+
+levels(ChromosomeScale$CHROM) #correct
+levels(AllCuSO4_glmer_1byRep$CHROM) #correct
+levels(q5_all$chr) #NULL
+levels(IntPeaks$CHROM) #correct
+levels(SecondaryPeaks$CHROM) #correct
+levels(NguyenCu_rf$CHROM) #NULL
+
+IntPeaks %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) -> IntPeaks
+  
+SecondaryPeaks %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) ->SecondaryPeaks
+NguyenCu_rf %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) ->NguyenCu_rf
+M_hotspots_rf %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) ->M_hotspots_rf
+Bloom_Ints_rf %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) -> Bloom_Ints_rf
+
+```
 
