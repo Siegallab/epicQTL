@@ -931,6 +931,7 @@ rbind(IntPeaks, SecondaryPeaks) %>% select(CHROM, POS) %>%
   mutate(label = "Interaction", CSS = "VIII") %>%
   merge(AllCuSO4_glmer_1byRep) %>%
   select(CSS, CHROM, POS, zscore) %>%
+  distinct() %>% 
   arrange(CSS, CHROM, POS, zscore) -> Interaction_Peaks
 
 write.csv(Interaction_Peaks, file = "Interaction_Peaks.csv", row.names = FALSE)
@@ -1082,7 +1083,6 @@ read.csv("C:/Users/Cassandra/Documents/R_FileTransfer/CuSO4_Phenotyping_2024.csv
   #ggplot(aes(x = paste(Dose, Strain), y = Survival_Percent, color = Strain)) + 
   ggplot(aes(x = factor(Strain), y = Survival_Percent, color = Strain)) + 
   geom_boxplot(size = 1, alpha = 0) + 
-  ggtitle("CuSO4 Survival by Strain") +
   #geom_jitter(aes(shape = Rep), size = 4, alpha = 0.6, width = 0.4) + 
   geom_jitter(aes(shape = Rep), size = 4, alpha = 0.6, position = position_jitterdodge(jitter.width = 0.01)) + 
   ylab("Survival Percentage") +
@@ -1098,7 +1098,7 @@ read.csv("C:/Users/Cassandra/Documents/R_FileTransfer/CuSO4_Phenotyping_2024.csv
 
 S1_Fig
 
-ggsave("S1_Fig.tif", S1_Fig, dpi = 300, width = 6, height = 4)
+ggsave("S1_Fig.tif", S1_Fig, dpi = 300, width = 6, height = 3.5)
 ```
 
 # Comparison with Previous Studies
