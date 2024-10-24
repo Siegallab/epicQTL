@@ -614,7 +614,7 @@ AllCuSO4_glmer_1byRep %>% ungroup() %>%
 
 checksd %>% filter(sdz < 0.25) -> AllCuSO4_glmer_1byRep
 
-sgd_orfs <- read.csv("C:/Users/Cassandra/Documents/R_FileTransfer/SGD_ORFs.csv")
+sgd_orfs <- read.csv("SGD_ORFs.csv")
 
 AllCuSO4_glmer_1byRep %>%
   merge(q5_all) %>% filter(label == "Interaction", 
