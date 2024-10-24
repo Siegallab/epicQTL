@@ -34,6 +34,15 @@ ggplot2::theme_set(theme_minimal() + theme(text = element_text(size = 10)) +
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank()))
 
+# Loci to look at specifically
+
+myloci <- data.frame(CHROM = c("V","V","IX", "III", "IV", "I", "III"),
+                     POS = c(375215, 116167,389572, 198671, 46271, 203403, 260311),
+                     name = c("FLO8", "URA3", "FLO11", "MAT", "HO", "FLO1", "TUP1"),
+                     cat = c("Floc", "X", "Floc", "X", "X", "Floc", "Floc"))
+```
+
+```{r, eval = FALSE}
 ChromosomeScale <- data.frame(CHROM = factor(as.character(as.roman(1:16)),
                                              levels = as.character(as.roman(1:16))),
                               start = rep(1, 16),
@@ -51,12 +60,7 @@ ChromosomeScale2 <- data.frame(CHROM = factor(as.character(as.roman(1:16)),
   pivot_longer(c(start, end), names_to = "delete", values_to = "POS") %>%
   mutate(summary = 0, label = "Bulk") %>% select(-delete)
 
-# Loci to look at specifically
 
-myloci <- data.frame(CHROM = c("V","V","IX", "III", "IV", "I", "III"),
-                     POS = c(375215, 116167,389572, 198671, 46271, 203403, 260311),
-                     name = c("FLO8", "URA3", "FLO11", "MAT", "HO", "FLO1", "TUP1"),
-                     cat = c("Floc", "X", "Floc", "X", "X", "Floc", "Floc"))
 
 ## RANDOM NEW FUNCTIONS
 
@@ -1138,7 +1142,7 @@ RM_YPS %>% ggplot(aes(x = Position, y = abs(Copper.sulfate))) + geom_point(alpha
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 AllEhCrosses %>% filter(Chromosome %in% c(8,12)) %>%
   mutate(OakWine = Cross == "RMxYPS") %>%
   ggplot(aes(x = Position, y = abs(Copper.sulfate))) + 
@@ -1158,7 +1162,7 @@ AllEhCrosses %>% filter(Chromosome %in% c(8,12)) %>%
 
 # Correlations in interaction hubs
 
-```{r, fig.width=10, fig.height=3}
+```{r, fig.width=10, fig.height=3, eval = FALSE}
 Albert_Hotspots <- read.csv("C:/Users/Cassandra/Downloads/SI_Data_08_hotspotTableForPaper_topGenes100_170420.csv")
 
 Albert_Hotspots %>% select(hotspotMarker, numberEQTLInHotspot) %>% 
@@ -1237,7 +1241,7 @@ NguyenCu %>%
 ```
 
 
-```{r, fig.width=10, fig.height=4}
+```{r, fig.width=10, fig.height=4, eval = FALSE}
 
 AlbertHotspotMap %>% 
   ggplot(aes(x = POS, y = -0.3)) + 
@@ -1329,5 +1333,19 @@ NguyenCu_rf %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) ->NguyenC
 M_hotspots_rf %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) ->M_hotspots_rf
 Bloom_Ints_rf %>% mutate(CHROM = factor(CHROM, levels = as.roman(1:16))) -> Bloom_Ints_rf
 
+```
+```{r}
+#AllCuSO4_glmer_1byRep %>% filter(CHROM == "VIII", label == "Bulk") %>% ggplot(aes(x = POS, y = zscore, color = CSS)) + geom_line()
+
+rd_factor_Cu %>% filter(CHROM == "VIII") %>% pivot_wider(names_from = Allele, values_from = SmoothCount) %>%
+  ggplot(aes(x = POS, y = log(Oak/Wine), color = Dataset)) + geom_point(alpha = 0.4) +
+  facet_grid(Bulk~Background) +  geom_hline(yintercept = 0) +
+  theme(legend.position = "none")
+
+rd_factor_Cu %>% filter(CHROM == "I") %>% pivot_wider(names_from = Allele, values_from = SmoothCount) %>%
+  ggplot(aes(x = POS, y = log(Oak/Wine), color = Dataset)) + geom_point(alpha = 0.4) +
+  facet_grid(Bulk~Background) + 
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "none")
 ```
 
