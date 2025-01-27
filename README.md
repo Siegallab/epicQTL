@@ -20,6 +20,9 @@ All raw data is linked or included below, and analysis scripts are included in t
    b. **Oak_VCF.txt** and **Wine_VCF.txt**: text files for parent data  
    c. **experiment_names_524.csv**: index of experiment names, to be loaded in to analysis scripts  
 
+### Visualization of Analysis
+An interactive RShiny app is available at https://cbuzby.shinyapps.io/VisualizeGLM/ 
+
 ### cybrBSA Package
 Please download the package by visiting the [cybrBSA github](https://github.com/cbuzby/cybrBSA) or by running the following code in R:
 ```
